@@ -1,10 +1,19 @@
 import streamlit as st
-from openai import OpenAI
-from keployrag.config import OPENAI_API_KEY, OPENAI_CHAT_MODEL
+from openai import AzureOpenAI
+from keployrag.config import (
+    AZURE_OPENAI_API_KEY, 
+    AZURE_OPENAI_ENDPOINT,
+    AZURE_OPENAI_API_VERSION,
+    AZURE_CHAT_DEPLOYMENT
+)
 from prompt_flow import execute_rag_flow
 
-# Initialize the OpenAI client
-client = OpenAI(api_key=OPENAI_API_KEY)
+# Initialize the Azure OpenAI client
+client = AzureOpenAI(
+    api_key=AZURE_OPENAI_API_KEY,
+    api_version=AZURE_OPENAI_API_VERSION,
+    azure_endpoint=AZURE_OPENAI_ENDPOINT
+)
 
 st.title("KeployRAG: Your Coding Assistant")
 

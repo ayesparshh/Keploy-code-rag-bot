@@ -1,8 +1,17 @@
-from openai import OpenAI
-from keployrag.config import OPENAI_API_KEY, OPENAI_CHAT_MODEL
+from openai import AzureOpenAI
+from keployrag.config import (
+    AZURE_OPENAI_ENDPOINT,
+    AZURE_OPENAI_API_KEY,
+    AZURE_OPENAI_API_VERSION,
+    AZURE_CHAT_DEPLOYMENT
+)
 from keployrag.search import search_code
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+client = AzureOpenAI(
+    api_key=AZURE_OPENAI_API_KEY,
+    api_version=AZURE_OPENAI_API_VERSION,
+    azure_endpoint=AZURE_OPENAI_ENDPOINT
+)
 
 SYSTEM_PROMPT = """
 You are an expert coding assistant. Your task is to help users with their question. Use the retrieved code context to inform your responses, but feel free to suggest better solutions if appropriate.
@@ -21,24 +30,20 @@ Your response:
 
 def execute_rag_flow(user_query):
     try:
-        # Perform code search
         search_results = search_code(user_query)
         
         if not search_results:
             return "No relevant code found for your query."
         
-        # Prepare code context
         code_context = "\n\n".join([
             f"File: {result['filename']}\n{result['content']}"
-            for result in search_results[:3]  # Limit to top 3 results
+            for result in search_results[:3]
         ])
         
-        # Construct the full prompt
         full_prompt = PRE_PROMPT.format(query=user_query, code_context=code_context)
         
-        # Generate response using OpenAI
         response = client.chat.completions.create(
-            model=OPENAI_CHAT_MODEL,
+            model=AZURE_CHAT_DEPLOYMENT,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": full_prompt}
